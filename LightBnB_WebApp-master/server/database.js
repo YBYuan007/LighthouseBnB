@@ -16,9 +16,6 @@ const pool = new Pool ({
  * @return {Promise<{}>} A promise to the user.
  */
 
-
-//  Accepts an email address and will return a promise.
-//  The promise should resolve with the user that has that email address, or null if that user does not exist.
  const getUserWithEmail = function(email) {
   return pool
   .query(`SELECT * FROM users WHERE email = $1; `, [email.toLowerCase()])
@@ -29,18 +26,6 @@ const pool = new Pool ({
     return null;
   });
 }
-// const getUserWithEmail = function(email) {
-//   let user;
-//   for (const userId in users) {
-//     user = users[userId];
-//     if (user.email.toLowerCase() === email.toLowerCase()) {
-//       break;
-//     } else {
-//       user = null;
-//     }
-//   }
-//   return Promise.resolve(user);
-// }
 exports.getUserWithEmail = getUserWithEmail;
 
 /**
@@ -63,12 +48,6 @@ const getUserWithId = function(id) {
 exports.getUserWithId = getUserWithId;
 
 
-// const getUserWithId = function(id) {
-//   return Promise.resolve(users[id]);
-// }
-// exports.getUserWithId = getUserWithId;
-
-
 /**
  * Add a new user to the database.
  * @param {{name: string, password: string, email: string}} user
@@ -87,14 +66,6 @@ exports.getUserWithId = getUserWithId;
 exports.addUser = addUser;
 
 
-// const addUser =  function(user) {
-//   const userId = Object.keys(users).length + 1;
-//   user.id = userId;
-//   users[userId] = user;
-//   return Promise.resolve(user);
-// }
-// exports.addUser = addUser;
-
 /// Reservations
 
 /**
@@ -102,9 +73,24 @@ exports.addUser = addUser;
  * @param {string} guest_id The id of the user.
  * @return {Promise<[{}]>} A promise to the reservations.
  */
-const getAllReservations = function(guest_id, limit = 10) {
-  return getAllProperties(null, 2);
-}
+
+ const getAllReservations = function (guest_id, limit = 10) {
+   console.log('guest_id is: ', guest_id, "limit is: ",limit);
+  return pool 
+  .query (`
+  SELECT * 
+  FROM reservations 
+  INNER JOIN properties 
+  ON reservations.property_id = properties.id 
+  WHERE guest_id = $1 
+  LIMIT $2`, 
+  [guest_id, limit=10])
+  .then ((result) => {
+    return result.rows})
+  .catch((err) => {
+    console.log('ERROR:', err.message);
+  });
+};
 exports.getAllReservations = getAllReservations;
 
 /// Properties

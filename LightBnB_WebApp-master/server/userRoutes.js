@@ -7,12 +7,13 @@ module.exports = function(router, database) {
     const user = req.body;
     user.password = bcrypt.hashSync(user.password, 12);
     database.addUser(user)
-    .then(user => {
-      if (!user) {
+    .then((re) => { 
+      console.log(re);
+      if (!re) {
         res.send({error: "error"});
         return;
       }
-      req.session.userId = user.id;
+      req.session.userId = re.id;
       res.send("🤗");
     })
     .catch(e => res.send(e));
